@@ -1,4 +1,3 @@
-
 # ⚙️ Engineering Room 
 > *“Efficiency is not about requirements, but about keeping any project alive.”*
 
@@ -16,9 +15,8 @@
 | [**memory_inspection**](./memory/memory_inspection.py) | Computational efficiency simulator via memory analysis with Python. | `/memory/` | ✅ Completed |
 | [**other_project**](.) | coming soon | `/topic/` |  |
 | [**other_project**](.) | coming soon | `/topic/` |  |
-| [**other_project**](.) | coming soon | `/topic/` |  |
 
-## Estrutura 
+## Theme Structure
 
 ```
 /
@@ -33,7 +31,7 @@
 ├── artificial-intelligence/
 ├── embedded-systems/
 ├── quality-and-testing/
-├── distributed-systems/
+├── distributed-systems/e
 └── cloud-architectures/ 
 └── ... (and other computer science pillars)  
 ```
