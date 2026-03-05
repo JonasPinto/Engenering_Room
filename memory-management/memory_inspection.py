@@ -34,65 +34,65 @@ def loading_animation(is_pt):
 
 def get_translations(is_pt):
     if is_pt:
-        return {
-            "intro_title": f"{Color.YELLOW}--- INSPEÇÃO TÉCNICA DE MEMÓRIA ---{Color.END}",
+        return { 
+            "intro_title": f"{Color.YELLOW}--- O mesmo dado em tipos diferentes tem tamanho diferente na memoria ---{Color.END}",
             "narrative": (
-                "No desenvolvimento de alta performance, cada byte conta.\n"
-                "Custos físicos são uma realidade e, em alta escala, a eficiência não se discute.\n"
-                "Esta ferramenta permite observar e mensurar como a memória é mapeada e alocada,\n"
-                "impactando diretamente a arquitetura do software como um todo."
+                "Para máxima eficiência e menores custos, cada byte conta.\n"
+                "Este experimento permite mensurar a quantidade de memória alocada em cada tipo de dado,\n"
+                "impactando diretamente o desempenho do software como um todo."
             ),
-            "continue": "\nPressione ENTER para iniciar a inspeção...",
+            "continue": "\nPressione ENTER para verificar...",
             "input_prompt": (
+                f"\n{Color.YELLOW}Escolha um tipo de dado e digite com o mesmo padrão abaixo{Color.END}\n"
                 f"\n{Color.BOLD}Exemplos:{Color.END}\n"
                 f"  {Color.GREEN}(10, 200){Color.END}  \u2190 Tupla\n"
                 f"  {Color.CYAN}'nome'{Color.END}     \u2190 String\n" 
                 f"  {Color.YELLOW}[1, 2, 3]{Color.END}  \u2190 Lista\n"
                 f"  {Color.RED}2506{Color.END}       \u2190 Inteiro\n"
                 f"  {Color.MAGENTA}1.89{Color.END}       \u2190 Float\n\n"
-                f"{Color.BOLD}Sua entrada: {Color.END}"
+                f"{Color.BOLD}Digitar Dado: {Color.END}"
             ),
-            "table_header": f"{Color.BOLD}{'Estrutura':<15} | {'Conteúdo':<15} | {'Rasa (Envelope)':<15} | {'Real (Total)'}{Color.END}",
+            "table_header": f"{Color.BOLD}{'Estrutura':<15} | {'Conteúdo':<15} | {'Shallow':<15} | {'Deep'}{Color.END}",
             "legend_title": f"\n{Color.YELLOW}--- ENTENDA OS RESULTADOS ---{Color.END}",
-            "shallow_def": f"{Color.BOLD}Memoria (Rasa):{Color.END} O peso do identificador/endereço (independente do conteúdo).",
-            "deep_def": f"{Color.BOLD}Memoria (Real):{Color.END} O peso real somado de toda a estrutura + conteúdo no silício.",
+            "shallow_def": f"{Color.BOLD}Shallow:{Color.END} O peso do identificador/endereço (sem conteúdo).",
+            "deep_def": f"{Color.BOLD}Deep:{Color.END} O peso de toda a estrutura + conteúdo no silício.",
             "static_facts": (
                 f"\n{Color.CYAN}--- TIPOS ESTÁTICOS ---{Color.END}\n"
-                "• 'None' e 'Booleanos' (True/False) nunca mudam de tamanho.\n"
+                "'None' e 'Booleanos' (True/False) nunca mudam de tamanho.\n"
                 "•  None:       16 bytes\n" 
                 "• True/False:  28 bytes.\n"
             ),
             "na": "Não Aplicável"
         }
     return {
-        "intro_title": f"{Color.YELLOW}--- TECHNICAL MEMORY INSPECTION ---{Color.END}",
+        "intro_title": f"{Color.YELLOW}--- THE SAME DATA IN DIFFERENT TYPES HAS DIFFERENT MEMORY SIZES ---{Color.END}",
         "narrative": (
-            "In high-performance development, every byte counts.\n"
-            "Physical costs are a reality and, at scale, efficiency is non-negotiable.\n"
-            "This tool allows us to observe and measure how memory is mapped and allocated,\n"
-            "directly impacting the software architecture as a whole."
+            "For maximum efficiency and lower costs, every byte counts.\n"
+            "This experiment allows measuring the amount of memory allocated in each data type,\n"
+            "directly impacting the software performance as a whole."
         ),
-        "continue": "\nPress ENTER to start inspection...",
-         "input_prompt": (
-                f"\n{Color.BOLD}Examples:{Color.END}\n" 
-                f"  {Color.GREEN}(10, 200){Color.END}  \u2190 Tupla\n"
-                f"  {Color.CYAN}'nome'{Color.END}     \u2190 String\n"
-                f"  {Color.YELLOW}[1, 2, 3]{Color.END}  \u2190 Lista\n"
-                f"  {Color.RED}2506{Color.END}       \u2190 Inteiro\n"
-                f"  {Color.MAGENTA}1.89{Color.END}       \u2190 Float\n\n"
-                f"{Color.BOLD}Your inpu: {Color.END}"
-            ),
-        "table_header": f"{Color.BOLD}{'Structure':<15} | {'Content':<15} | {'Shallow (Envelope)':<15} | {'Deep (Total)'}{Color.END}",
+        "continue": "\nPress ENTER to verify...",
+        "input_prompt": (
+            f"\n{Color.YELLOW}Choose a data type and type it following the pattern below{Color.END}\n"
+            f"\n{Color.BOLD}Examples:{Color.END}\n"
+            f"  {Color.GREEN}(10, 200){Color.END}  \u2190 Tuple\n"
+            f"  {Color.CYAN}'nome'{Color.END}     \u2190 String\n"
+            f"  {Color.YELLOW}[1, 2, 3]{Color.END}  \u2190 List\n"
+            f"  {Color.RED}2506{Color.END}       \u2190 Integer\n"
+            f"  {Color.MAGENTA}1.89{Color.END}       \u2190 Float\n\n"
+            f"{Color.BOLD}Your input: {Color.END}"
+        ),
+        "table_header": f"{Color.BOLD}{'Structure':<15} | {'Content':<15} | {'Shallow':<15} | {'Deep'}{Color.END}",
         "legend_title": f"\n{Color.YELLOW}--- UNDERSTANDING THE RESULTS ---{Color.END}",
-        "shallow_def": f"{Color.BOLD}Memory (Shallow):{Color.END} The weight of the identifier/address (regardless of the content).",
-        "deep_def": f"{Color.BOLD}Memory    (Deep):{Color.END} The actual combined weight of the entire structure + the content in the silicon.",
+        "shallow_def": f"{Color.BOLD}Shallow:{Color.END} The weight of the identifier/address (without content).",
+        "deep_def": f"{Color.BOLD}Deep:{Color.END} The weight of the entire structure + content in the silicon.",
         "static_facts": (
-            f"\n{Color.CYAN}--- STATIC / IMMUTABLE TYPES ---{Color.END}\n"
-            "• 'None' and 'Booleans' (True/False) have fixed size (never change).\n"
+            f"\n{Color.CYAN}--- STATIC TYPES ---{Color.END}\n"
+            "'None' and 'Booleans' (True/False) never change size.\n"
             "•  None:       16 bytes\n"
-            "• True/False:  28 bytes\n"
+            "• True/False:  28 bytes.\n"
         ),
-        "na": "Not Applicable (Mutable)"
+        "na": "Not Applicable"
     }
 
 def run_lab():
@@ -119,18 +119,22 @@ def run_lab():
 
     loading_animation(is_pt)
 
-    # Verificação técnica de Hashability (Garante que não quebre com listas/dicts)
+    # Verificação técnica de Hashability
     is_hashable = base_val.__hash__ is not None if base_val is not None else False
+    
+    # Verificação de conversão numérica
+    is_numeric = str(base_val).lstrip('-').replace('.','',1).isdigit()
 
     # Lógica de Comparação
     comparisons = [
         ("String", str(base_val)),
-        ("Integer", int(base_val) if str(base_val).lstrip('-').replace('.','',1).isdigit() else None),
+        ("Integer", int(float(base_val)) if is_numeric else None),
+        ("Float", float(base_val) if is_numeric else None),
         ("List", [base_val]),
         ("Tuple", (base_val,)),
         ("Set", {base_val} if is_hashable else None),
-        ("Dict (as Key)", {base_val: 0} if is_hashable else None),
-        ("Dict (as Val)", {"key": base_val})
+        ("Dict (as Key)", {base_val: " "} if is_hashable else None),
+        ("Dict (as Val)", {" ": base_val})
     ]
 
     # Janela 4: Resultados
@@ -147,16 +151,12 @@ def run_lab():
             display = str(obj) if len(str(obj)) < 15 else str(obj)[:12] + "..."
             print(f"{name:<15} | {display:<15} | {s_size:<6} bytes   | {d_size:<6} bytes")
         else:
-            # Caso o dado seja mutável (lista), ele não pode ser Chave ou Set
             print(f"{Color.RED}{name:<15} | {t['na']:<15} | {'-':<15} | {'-'}{Color.END}")
 
     print("="*75)
     print(t["legend_title"])
     print(f" \u2192 {t['shallow_def']}")
     print(f" \u2192 {t['deep_def']}")
-    
-    
-    
     print(t["static_facts"])
     print("\n")
 
