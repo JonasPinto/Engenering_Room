@@ -15,8 +15,8 @@
 
 | Project | Description | Directory | Status |
 | :--- | :--- | :--- | :--- |
-| [**memory_inspection**](./memory/memory_inspection.py) | Physical memory usage meter in Python | `/memory/` | ✅ Completed |
-| [**ArenaAllocator**](.) | Pre-allocated memory management that is internally subdivided in a linear fashion. | `/efficiency-and-performance/` | 🔄 In-Progress |
+| [**memory_inspection**](./memory_management) | Physical memory usage meter in Python | `/memory/` | ✅ Completed |
+| [**arena_allocator**](./efficiency_and_performance) | Pre-allocated memory management that is internally subdivided in a linear fashion. | `/efficiency_and_performance/` | 🔄 In-Progress |
 | [**other_project**](.) | coming soon | `/topic/` | 🌫️ Undefined |
 
 ## Theme Structure
