@@ -8,10 +8,6 @@
  ![Ubuntu](https://img.shields.io/badge/ubuntu-%23E95420.svg?style=for-the-badge&logo=ubuntu&logoColor=white)
  ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
  ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
-<<<<<<< HEAD
-
-=======
->>>>>>> 953d207971687db23aed90c71f527f4f7dfc5375
  
  ##
 
