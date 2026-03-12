@@ -12,6 +12,7 @@ import gzip
 import bz2
 import msgpack
 import yaml
+import argparse
 from collections import deque, namedtuple
 from pympler import asizeof
 
@@ -19,14 +20,14 @@ from pympler import asizeof
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+from rich.progress import Progress, TextColumn, BarColumn, TaskProgressColumn
 from rich.prompt import Prompt
 from rich.align import Align
 from rich.text import Text
 from rich.columns import Columns
 from rich.theme import Theme
 
-# Customizing theme for a smoother experience
+# Customizing theme for a professional experience
 custom_theme = Theme({
     "info": "cyan",
     "warning": "magenta",
@@ -37,7 +38,7 @@ custom_theme = Theme({
 })
 
 console = Console(theme=custom_theme)
-THEME_COLOR = "cyan"  # Softer than blue
+THEME_COLOR = "cyan"
 
 # Classes for RAM comparison
 class StandardClass:
@@ -77,12 +78,15 @@ def get_system_info():
 def to_mb(b): 
     return b / (1024 * 1024)
 
-def run_benchmark(data_choice, base_val):
+def run_benchmark(data_choice, base_val, interactive=True):
     """Massive simulation with 3 million items and REAL file creation."""
-    show_header("SIMULATION OF DATA MEMORY ON DISC") 
+    if interactive:
+        show_header("SIMULATION OF DATA MEMORY ON DISC") 
+    else:
+        console.print(f"\n[bold {THEME_COLOR}]SIMULATION OF DATA MEMORY ON DISC[/bold {THEME_COLOR}]")
     
     items_count = 3000000 
-    temp_dir = "/home/jonas/Engineering_Room/memory_management/inspection/files"
+    temp_dir = os.path.join(os.getcwd(), "benchmark_files")
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
@@ -101,11 +105,24 @@ def run_benchmark(data_choice, base_val):
         ("GZIP (Compressed)", "data.csv.gz"),
         ("BZ2 (Compressed)", "data.csv.bz2")
     ]
-
+ 
     disk_results = {}
     
+    # RAM Calculation (First Step)
+    console.print("[info]Creating files and calculating memory...[/info]")
+    ptr_array_size = 8 * items_count
+    obj_individual_size = asizeof.asizeof(base_val)
+    total_python_ram = ptr_array_size + (obj_individual_size * items_count)
+    
+    if data_choice == "1": # Int
+        raw_data_size = 8 * items_count
+    elif data_choice == "2": # Float
+        raw_data_size = 8 * items_count
+    else: # String/Complex
+        raw_data_size = len(str(base_val)) * items_count
+
+    # Disk Creation with Single Global Progress Bar
     with Progress(
-        SpinnerColumn(spinner_name="dots"), 
         TextColumn("[progress.description]{task.description}"),
         BarColumn(bar_width=None, pulse_style="cyan"),
         TaskProgressColumn(),
@@ -113,26 +130,10 @@ def run_benchmark(data_choice, base_val):
         transient=True,
     ) as progress:
         
-        # RAM Calculation Task
-        ram_task = progress.add_task(description="[info]Analyzing Python RAM Overhead...[/info]", total=100)
+        global_task = progress.add_task(description="PROGRESS ->", total=len(files_to_create))
         
-        ptr_array_size = 8 * items_count
-        obj_individual_size = asizeof.asizeof(base_val)
-        total_python_ram = ptr_array_size + (obj_individual_size * items_count)
-        
-        if data_choice == "1": # Int
-            raw_data_size = 8 * items_count
-        elif data_choice == "2": # Float
-            raw_data_size = 8 * items_count
-        else: # String/Complex
-            raw_data_size = len(str(base_val)) * items_count
-            
-        progress.update(ram_task, completed=100)
-
-        # Disk Creation Tasks
         for fmt, filename in files_to_create:
             file_path = os.path.join(temp_dir, filename)
-            task = progress.add_task(description=f"[warning]Creating {fmt}...[/warning]", total=items_count)
             
             try:
                 if "XML" in fmt:
@@ -141,7 +142,6 @@ def run_benchmark(data_choice, base_val):
                         f.write("<root>\n")
                         for i in range(items_count):
                             f.write(f"{indent}<item id='{i}'>{base_val}</item>\n")
-                            if i % 100000 == 0: progress.update(task, advance=100000)
                         f.write("</root>")
                 
                 elif "YAML" in fmt:
@@ -149,7 +149,6 @@ def run_benchmark(data_choice, base_val):
                         f.write("items:\n")
                         for i in range(items_count):
                             f.write(f"  - {base_val}\n")
-                            if i % 100000 == 0: progress.update(task, advance=100000)
                 
                 elif "JSON" in fmt:
                     indent = 2 if "Indented" in fmt else None
@@ -160,14 +159,12 @@ def run_benchmark(data_choice, base_val):
                                 f.write("  ")
                                 json.dump(base_val, f)
                                 if i < items_count - 1: f.write(",\n")
-                                if i % 100000 == 0: progress.update(task, advance=100000)
                             f.write("\n]")
                         else:
                             f.write("[")
                             for i in range(items_count):
                                 json.dump(base_val, f)
                                 if i < items_count - 1: f.write(",")
-                                if i % 100000 == 0: progress.update(task, advance=100000)
                             f.write("]")
                 
                 elif "HTML" in fmt:
@@ -175,7 +172,6 @@ def run_benchmark(data_choice, base_val):
                         f.write("<table>\n")
                         for i in range(items_count):
                             f.write(f"  <tr><td>{base_val}</td></tr>\n")
-                            if i % 100000 == 0: progress.update(task, advance=100000)
                         f.write("</table>")
 
                 elif "CSV" in fmt:
@@ -183,19 +179,16 @@ def run_benchmark(data_choice, base_val):
                         writer = csv.writer(f)
                         for i in range(items_count):
                             writer.writerow([base_val])
-                            if i % 100000 == 0: progress.update(task, advance=100000)
                 
                 elif "PICKLE" in fmt:
                     with open(file_path, 'wb') as f:
                         pickle.dump([base_val] * items_count, f, protocol=pickle.HIGHEST_PROTOCOL)
-                        progress.update(task, completed=items_count)
                 
                 elif "MSGPACK" in fmt:
                     with open(file_path, 'wb') as f:
                         packer = msgpack.Packer()
                         for i in range(items_count):
                             f.write(packer.pack(base_val))
-                            if i % 100000 == 0: progress.update(task, advance=100000)
 
                 elif "BINARY" in fmt:
                     with open(file_path, 'wb') as f:
@@ -204,28 +197,28 @@ def run_benchmark(data_choice, base_val):
                         else: data = str(base_val).encode('utf-8')
                         for i in range(items_count):
                             f.write(data)
-                            if i % 100000 == 0: progress.update(task, advance=100000)
                 
                 elif "GZIP" in fmt:
                     with gzip.open(file_path, 'wt', newline='') as f:
                         writer = csv.writer(f)
                         for i in range(items_count):
                             writer.writerow([base_val])
-                            if i % 100000 == 0: progress.update(task, advance=100000)
                 
                 elif "BZ2" in fmt:
                     with bz2.open(file_path, 'wt', newline='') as f:
                         writer = csv.writer(f)
                         for i in range(items_count):
                             writer.writerow([base_val])
-                            if i % 100000 == 0: progress.update(task, advance=100000)
                 
                 disk_results[fmt] = os.path.getsize(file_path)
-                progress.update(task, completed=items_count)
+                # Print compiler-style completion message
+                progress.console.print(f"[bold green]✔[/bold green] {fmt}")
                 
             except Exception as e:
                 disk_results[fmt] = 0
-                progress.update(task, description=f"[danger]Error {fmt}: {str(e)}[/danger]")
+                progress.console.print(f"[bold red]✘[/bold red] {fmt} (Error: {str(e)})")
+            
+            progress.advance(global_task)
 
     # Results Table
     console.print(f"\n[accent]DATA PROCESSED:[/accent] [white]{base_val}[/white] (Replicated {items_count:,} times)\n")
@@ -241,46 +234,58 @@ def run_benchmark(data_choice, base_val):
     unified_table.add_section()
     
     # Disk Rows (Sorted by size)
-    sorted_disk = sorted(disk_results.items(), key=lambda x: x[1], reverse=True)
-    first = True
-    for fmt, size in sorted_disk:
-        cat = "DISK STORAGE" if first else ""
-        if size == max(disk_results.values()): style = "danger"
-        elif size == min(disk_results.values()): style = "success"
-        else: style = "warning"
+    valid_disk_results = {k: v for k, v in disk_results.items() if v > 0}
+    if valid_disk_results:
+        sorted_disk = sorted(disk_results.items(), key=lambda x: x[1], reverse=True)
+        first = True
+        max_size = max(valid_disk_results.values())
+        min_size = min(valid_disk_results.values())
         
-        size_str = f"[{style}]{to_mb(size):>10.4f} MB[/{style}]" if size < 1024*1024 else f"[{style}]{to_mb(size):>10.2f} MB[/{style}]"
-        unified_table.add_row(cat, fmt, size_str)
-        first = False
+        for fmt, size in sorted_disk:
+            cat = "DISK STORAGE" if first else ""
+            if size == max_size: style = "danger"
+            elif size == min_size: style = "success"
+            else: style = "warning"
+            
+            size_str = f"[{style}]{to_mb(size):>10.4f} MB[/{style}]" if size < 1024*1024 else f"[{style}]{to_mb(size):>10.2f} MB[/{style}]"
+            unified_table.add_row(cat, fmt, size_str)
+            first = False
 
-    console.print(unified_table)
+        console.print(unified_table)
 
-    # Insights
-    ram_overhead = ((total_python_ram - raw_data_size) / raw_data_size) * 100 if raw_data_size > 0 else 0
-    disk_diff = (max(disk_results.values()) / min(disk_results.values())) if min(disk_results.values()) > 0 else 0
-    
-    console.print(f"\n[accent]TECHNICAL RESULTS:[/accent]")
-    console.print(f" • [danger]RAM Overhead:[/danger] Python objects use [bold]{ram_overhead:.1f}%[/bold] more memory than raw data.")
-    console.print(f" • [info]Disk Extreme:[/info] The heaviest format is [bold]{disk_diff:.1f}x[/bold] larger than the most compressed.")
+        # Insights
+        ram_overhead = ((total_python_ram - raw_data_size) / raw_data_size) * 100 if raw_data_size > 0 else 0
+        disk_diff = (max_size / min_size) if min_size > 0 else 0
+        
+        console.print(f"\n[accent]TECHNICAL RESULTS:[/accent]")
+        console.print(f" • [danger]RAM:[/danger] Python objects use [bold]{ram_overhead:.1f}%[/bold] more memory than raw data.")
+        console.print(f" • [info]Disk:[/info] The heaviest format is [bold]{disk_diff:.1f}x[/bold] larger than the most compressed.")
+    else:
+        console.print("[danger]No valid disk results to display.[/danger]")
 
-    # Final Options
-    console.print(f"\n[warning]WHAT WOULD YOU LIKE TO DO NEXT?[/warning]")
-    console.print(f" [bold cyan]1[/bold cyan] - Analyze another data (Cleans current files)")
-    console.print(f" [bold cyan]2[/bold cyan] - Delete files and EXIT program")
-    
-    choice = Prompt.ask("\n[bold white]Select an option[/bold white]", choices=["1", "2"], default="1")
-    
     # Cleanup logic
     for _, filename in files_to_create:
         try: os.remove(os.path.join(temp_dir, filename))
         except: pass
+    try: os.rmdir(temp_dir)
+    except: pass
+
+    if interactive:
+        # Final Options
+        console.print(f"\n[warning]WHAT WOULD YOU LIKE TO DO NEXT?[/warning]")
+        console.print(f" [bold cyan]1[/bold cyan] - Analyze another data") 
+        console.print(f" [bold cyan]2[/bold cyan] - EXIT program\n")
         
-    if choice == '2':
-        console.print("\n[success]Files cleaned successfully. Goodbye![/success]")
-        sys.exit(0)
+        choice = Prompt.ask("\n[bold white]Select an option[/bold white]", choices=["1", "2"], default="1")
+        
+        if choice == '2':
+            console.print("\n[success]Files cleaned successfully. Goodbye![/success]")
+            sys.exit(0)
+        else:
+            console.print("\n[info]Returning to main menu...[/info]")
+            time.sleep(1)
     else:
-        console.print("\n[info]Returning to main menu...[/info]")
-        time.sleep(1)
+        console.print("\n[success]Benchmark completed successfully.[/success]")
 
 def run_inspector():
     """Analyzes a single data item and then asks user to proceed to massive benchmark."""
@@ -368,6 +373,16 @@ def run_inspector():
         run_benchmark("3", base_val) 
 
 def main():
+    parser = argparse.ArgumentParser(description="Python Memory & Disk Extremes Laboratory")
+    parser.add_argument("--benchmark", action="store_true", help="Run benchmark directly with default value")
+    args = parser.parse_args()
+
+    if args.benchmark:
+        # Run benchmark directly with a default value (e.g., 12345)
+        default_val = 12345
+        run_benchmark("1", default_val, interactive=False)
+        return
+
     narrative = ( 
         "[italic muted]\"Different types of data occupy different amounts of memory.\n"
         "Each extra byte impacts the performance and costs of an application.\n"
@@ -378,7 +393,7 @@ def main():
         show_header("PYTHON MEMORY & DISK EXTREMES LABORATORY")
         console.print(get_system_info())
         console.print(f"\n{narrative}")
-        run_inspector()
+        run_inspector() 
  
 if __name__ == "__main__":
     main()
