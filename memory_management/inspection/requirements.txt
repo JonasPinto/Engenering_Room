@@ -1,2 +1,4 @@
-Pympler==1.1
+msgpack_python==0.5.6
+pympler==1.1
+PyYAML==6.0.3
 rich==14.3.3
